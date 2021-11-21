@@ -1,0 +1,195 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>accountbook</title>
+<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="/static/css/record_mini.css">
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/echarts.js"></script>
+<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+</head>
+<body>
+	
+<div id="leftbar">
+		<form id="form_1" action="/money_mini/" method="post">
+			{% csrf_token %}
+			<h3>落款人</h3>
+			<blockquote>
+			{% for books in objectlist%}
+				   <p class="bg-info">{{books}}</p>
+			{% endfor %}
+			</blockquote>
+			<input type="text" name="signer" class="btn btn-default">
+			<h4>账单</h4>
+			<input type="text" name="name" class="btn btn-default">
+			<h4>金额</h4>
+			<input type="text" name="price" class="btn btn-default">
+			<h4>标签</h4>
+			<input type="text" name="tag" class="btn btn-default">
+			<h4>日期</h4>
+			<input type="text" name="consumedata" class="btn btn-default">
+			<p>&nbsp;</p>
+			<input type="submit" value="添加" class="btn btn-default btn-lg btn-block">
+		</form>
+	</div>
+	<div id="information">
+		{%for list in record %}
+			{% if list == -1 %}
+		    <blockquote id="output">
+			{% endif %}
+			{% if list != -1 %}
+				{% if list != -2 %}
+		        <p class="bg-info" style="color: white">{{list}}</p>
+				{% endif %}
+			{% endif %}	
+			{% if list == -2 %}	
+			</blockquote>
+			{% endif %}
+		{% endfor %}
+	</div>
+	<div id="right_bar">
+		
+		<div style="position: absolute; top: 15;left: 15;">一共{{length}}条(￣y▽￣)~</div>
+		<a style="position: absolute;top: 15;right: 15;text-decoration:none;color: white" href="{% url 'money' %}">
+			特效on/off
+		</a>
+		<div id="table_i">
+		</div>
+		
+		<script type="text/javascript">
+		        // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('table_i'));
+ 
+   option = {
+	title:{text:"条数",
+		  textStyle:{color:'#FFFFFF'},
+		   x:'center',
+        y:'top',
+        textAlign:'center',
+		  },
+    xAxis: {
+
+        type: 'category',
+		axisTick: {
+    show: false
+},       
+		"splitLine": {     //网格线
+          "show": false
+        },
+		
+	data:{{ tag_name|safe }}
+    },
+    yAxis: {
+        type: 'value',
+		axisLabel: {
+    show: false
+},
+		axisTick: {
+    show: false
+},       
+	"splitLine": {     //网格线
+          "show": false
+        },
+    },
+				 label: {
+    		show: true, //开启显示
+    		position: 'top', //在上方显示
+    		textStyle: { //数值样式
+    		    color: 'white',
+    			fontSize: 16,
+    			fontWeight: 100
+    			},},
+    series: [{
+        type: 'bar',
+        smooth: false,
+		color:'rgba(255,204,0,0.80)',
+		barWidth : 50,
+		data:{{tag_count}},
+	}]
+};
+        myChart.setOption(option);
+		
+		</script>
+		
+		<div id="main">
+	    </div>
+		<script type="text/javascript">
+			
+			kv = {{ price_data|safe }};
+var test = new Array();
+for (var i in kv) {
+
+	for (var logKey in kv[i]){
+		    test.push({value: kv[i][logKey], name: logKey});
+	}
+
+}
+    var myChart = echarts.init(document.getElementById('main'));
+ 
+option = {
+		title:{text:"各标签消费占比",
+		  textStyle:{color:'#FFFFFF'},
+		   x:'center',
+        y:'top',
+        textAlign:'lef',
+		  },
+    series : [
+        {
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            data:test,
+            roseType: 'angle',
+            label: {
+                normal: {
+                    textStyle: {
+                        color: 'rgba(255,204,0,0.80)'
+                    }
+                }
+            },
+            labelLine: {
+                normal: {
+                    lineStyle: {
+                        color: 'rgba(255,204,0,0.80)'
+                    }
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: 'rgba(255,204,0,0.80)',
+                }
+            }
+        }
+    ]
+};
+        myChart.setOption(option);
+		</script>
+		
+		<div id="list">
+			<table class="table">
+				<tr>
+				      <th>标签</th>
+				  {% for i in tag_name %}
+					  <th>{{i}}</th>
+				  {% endfor %}
+				</tr>
+			    <tr>
+					<td>条数</td>
+				  {% for i in tag_count %}
+					  <td>{{i}}</td>
+				  {% endfor %}
+				</tr>
+				<tr>
+					<td>金额</td>
+				  {% for i in price_tag %}
+					  <td>{{i}}</td>
+				  {% endfor %}
+				</tr>
+			</table>
+			
+		</div>
+		
+	</div>
+	
+	
+</body>
